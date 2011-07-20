@@ -1,0 +1,36 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE:  rem.sh
+# 
+#         USAGE:  ./rem.sh 
+# 
+#   DESCRIPTION:  instead of RM, in reality it use MV
+# 
+#       OPTIONS:  ---
+#  REQUIREMENTS:  ---
+#         NOTES:  ---
+#      REVISION:  ---
+#         EMAIL: imyeyeslove@163.com
+#       COMPANY: 
+#       CREATED: 26.01.2010
+#     COPYRIGHT: Copyright (c) 2010, Yang Zhang
+#===============================================================================
+
+(($# == 0)) && { echo -e "No Argument!\n"; exit 1; }
+
+if [ ! -e ~/.trash ] ; then
+	mkdir ~/.trash
+	echo "There's no dustbin here, so I made it myself"
+fi
+
+for file in $* ; do
+        mv -f $file ~/.trash/                        # mv -f $file ~/.trash
+	echo "Delete $file"
+done
+
+#(($#==0)) && { echo "No Argument!";exit 1; }
+#for i in $*
+#do
+#        mv -f $i ~/.trash/$(find $(pwd) -maxdepth 1 -name $i|tr "/" "=")
+#done

@@ -1,0 +1,6 @@
+remove Lock = Caps_Rock
+remove Control = Control_R
+keysym Caps_Rock = Control_R
+keysym Control_R = Caps_Rock
+add Lock = Caps_Rock
+add Control = Control_R

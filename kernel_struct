@@ -1,0 +1,163 @@
+#!/bin/sh 
+# echo help information. 
+
+function usage () 
+{ 
+    echo "${program_name}: search defination of struct." 
+    #cat << EOF 
+    echo -n "
+Usage: ${program_name} [option] struct files. 
+OPTION: 
+-r: 
+recursive search defination of struct in files. 
+-h: 
+print help information. 
+
+EXAMPLE: 
+1: 
+${program_name} task_struct /kernel/include/linux/* 
+no-recursive find struct task_struct in dir /kernel/include/linux 
+2: 
+${program_name} -r task_struct /kernel/include/linux 
+recursive find struct task_struct in dir /kernel/include/linux 
+3: 
+${program_name} -r task_struct /kernel/include/linux/sched.h 
+find struct task_struct in file sched.h 
+"
+#EOF 
+    exit 1
+} 
+
+# 
+# search struct in regulare file. 
+# $1 struct 
+# $2 file 
+# 
+
+function search_in_file () 
+{ 
+    if test $# -eq 2;then 
+        struct="$1" 
+        file="$2" 
+
+
+        space='[[:space:]]\{1,\}' 
+        is_space='[[:space:]]\{0,\}' 
+        start='/^'${is_space}struct${space}${struct}${space}'{'${is_space}'$/' 
+        end='/^}'${is_space}';'${is_space}'$/' 
+
+        result=$(sed -n ${start}','${end}'p' ${file} 2>/dev/null) 
+
+
+    else 
+        return 1 
+    fi 
+} 
+
+# 
+# recursive lookup dir, then search struct in files 
+# $1 struct 
+# $2 dir 
+# 
+
+function search_in_dir () 
+{ 
+    local struct 
+    local dir 
+
+    if test $# -eq 2;then 
+        struct="$1" 
+        dir=$2 
+        files="$(ls -1 2>/dev/null)" 
+
+        if ! test -z "${files}";then 
+            search ${struct} ${files} 
+        fi 
+
+    else 
+        return 1 
+    fi 
+} 
+
+
+function search () 
+{ 
+    local struct 
+
+    if test $# -ge 2;then 
+        struct="$1" 
+        shift 1 
+
+        for file in $* 
+        do 
+            if test -f ${file};then 
+                search_in_file ${struct} ${file} 
+                if test -z "${result}" ;then 
+                    result="" 
+                else 
+                    echo "${file}" 
+                    echo "" 
+                    echo "${result}" 
+                    exit 0 
+                fi 
+            else 
+                if test -d ${file} && test ${recursive} -eq 1;then 
+                    (cd ${file};search_in_dir ${struct} ${file}) 
+                fi 
+            fi 
+        done 
+    else 
+        return 1 
+    fi 
+} 
+
+
+
+# 
+# begin at here. 
+# 
+
+declare program_name 
+declare struct 
+declare file 
+declare recursive 
+
+export result="" 
+export recursive=0 
+
+program_name="${0##*/}" 
+if [[ -z ${program_name} ]];then 
+    program_name=$0 
+fi 
+
+
+
+# 
+# get arguments. 
+# 
+
+while getopts ':rh' opt 
+do 
+    case ${opt} in 
+        r) 
+            recursive=1;; 
+        h) 
+            usage ;; 
+        [?]) 
+            echo "${program_name}: use option '-h' get help information." 
+            exit 1 
+    esac 
+
+done 
+
+shift $(expr ${OPTIND} - 1) 
+
+if test $# -ge 2;then 
+    struct="$1" 
+    shift 1 
+    files=$* 
+    search ${struct} ${files} 
+else 
+    echo "${program_name} [options] sturct files." 
+    exit 1 
+fi 

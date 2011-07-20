@@ -1,0 +1,28 @@
+#!/bin/bash - 
+#=========================================================
+#          FILE:  a.sh
+#   DESCRIPTION:  
+#       OPTIONS:  ---
+#  REQUIREMENTS:  ---
+#         NOTES:  ---
+#      REVISION:  ---
+#         EMAIL: armx86@gmail.com
+#       CREATED: 21.01.2011
+#     COPYRIGHT: Copyright (c) 2011, Yang Zhang
+#=========================================================
+
+touch /home/hask/bin_pkg
+pkglist=`ls /var/cache/pacman/pkg/`
+for pkg in $pkglist; do
+    lists=`tar xvf /var/cache/pacman/pkg/${pkg}`
+    pkg=${pkg%${pkg##*-}}
+    pkg=${pkg%-}
+    for lst in $lists; do
+        bin=${lst##*/}
+        if [ -z $bin ]; then continue; fi
+        lst=${lst%/*}
+        lst=${lst##*/}
+        if [ $lst != "bin" -a $lst != "sbin" ]; then continue; fi
+        echo -e "${pkg}\t\t${bin}" >> bin_pkg
+    done
+done

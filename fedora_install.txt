@@ -1,0 +1,38 @@
+#!/bin/bash - 
+
+sudo gpasswd -a hask wheel
+sudo rpm --import /etc/pki/rpm-gpg/*
+sudo rpm -ivh http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm
+sudo rpm -ivh http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm
+sudo rpm --import http://dag.wieers.com/rpm/packages/RPM-GPG-KEY.dag.txt
+sudo rpm -ivh rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm 
+sudo rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-rpmfusion-*
+wget http://dl-ssl.google.com/linux/linux_signing_key.pub
+sudo rpm --import linux_signing_key.pub 
+rm linux_signing_key.pub 
+
+sudo gedit /etc/yum.repos.d/chromium.repo
+[fedora-chromium]
+name=Chromium web browser and deps
+baseurl=http://repos.fedorapeople.org/repos/spot/chromium/fedora-$releasever/$basearch/
+enabled=1
+gpgcheck=0
+[fedora-chromium-source]
+name=Chromium web browser and deps - Source
+baseurl=http://repos.fedorapeople.org/repos/spot/chromium/fedora-$releasever/SRPMS/
+enabled=0
+gpgcheck=0
+
+sudo yum install yum-fastestmirror
+sudo yum install axel
+sudo yum install gconf-editor
+sudo yum install chromium-browser
+sudo rpm -ivh /media/sdb6/soft/linux/flash-plugin-10.1.102.65-release.i386.rpm
+sudo yum install kernel-PAE kernel-PAE-devel (kernel-PAE*)
+
+tar xvf soft/linux/yum-axelget
+sudo vim /etc/yum/pluginconf.d/langpacks.conf 
+sudo vim /etc/yum/pluginconf.d/priorities.conf 
+&country=us in /etc/yum.repos.d/
+
+ssh-keygen
